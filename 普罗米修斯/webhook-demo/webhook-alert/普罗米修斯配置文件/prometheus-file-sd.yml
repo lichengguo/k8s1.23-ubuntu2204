@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+scrape_configs:
+- job_name: 'file_ds'
+  file_sd_configs:
+  #Prometheus默认每5m重新读取一次文件内容，当需要修改时，可以通过refresh_interval进行设置
+  - refresh_interval: 1m
+    files:
+    - targets.json
