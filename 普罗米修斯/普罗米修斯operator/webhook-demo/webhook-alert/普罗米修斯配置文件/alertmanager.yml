@@ -1,0 +1,18 @@
+global:
+  smtp_smarthost: smtp.163.com:25
+  smtp_from: 13138892570@163.com
+  smtp_auth_username: 13138892570@163.com
+  smtp_auth_identity: 13138892570@163.com
+  smtp_auth_password: ENeAH38Wh3vSG6kh
+
+route:
+  group_by: ['alertname']
+  receiver: 'default-receiver'
+
+receivers:
+  - name: default-receiver
+    email_configs:
+      - to: 1029612787@qq.com
+        send_resolved: true
+    webhook_configs:
+      - url: http://10.0.1.1:8085/webhook/dingding

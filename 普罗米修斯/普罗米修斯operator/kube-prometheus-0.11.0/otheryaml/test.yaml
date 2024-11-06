@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  name: kube-controller-manager
+  labels:
+    app.kubernetes.io/name: kube-controller-manager
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: https-metrics
+    port: 10257
+    targetPort: 10257
+    protocol: TCP
+
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app.kubernetes.io/name: kube-controller-manager
+  name: kube-controller-manager
+  namespace: kube-system
+subsets:
+- addresses:
+  - ip: 10.0.1.201
+  - ip: 10.0.1.202
+  ports:
+  - name: https-metrics
+    port: 10257
+    protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: kube-system
+  name: kube-scheduler
+  labels:
+    app.kubernetes.io/name: kube-scheduler
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: https-metrics
+    port: 10259
+    targetPort: 10259
+    protocol: TCP
+
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app.kubernetes.io/name: kube-scheduler
+  name: kube-scheduler
+  namespace: kube-system
+subsets:
+- addresses:
+  - ip: 10.0.1.201
+  - ip: 10.0.1.202
+  ports:
+  - name: https-metrics
+    port: 10259
+    protocol: TCP
+
+
