@@ -1254,7 +1254,7 @@ data:
 
 ![1731505411012](images\1731505411012.png)  
 
-![1731505445612](images\1731505445612.png)  
+![1731505445612](./images/1731505445612.png)  
 
 
 
@@ -1272,6 +1272,111 @@ data:
 
 
 ##### 模拟业务上线收集日志
+
+
+
+```yaml
+---
+# deployment.yaml
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: go-gin-log-k8s
+  namespace: prod
+  labels:
+    name: go-gin-log-k8s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: go-gin-log-k8s
+  template:
+    metadata:
+      labels:
+        app: go-gin-log-k8s
+        name: go-gin-log-k8s
+    spec:
+      containers:
+      - name: go-gin-log-k8s
+        image: harbor.alnk.com/public/go-gin-log:0.4
+        # 添加相应的环境变量
+        # 下面收集了两块日志
+        # go-gin-std:屏幕打印日志
+        # go-gin-log:/app目录下所有*.log文件日志
+        # 如日志发送到es，那index名称为go-gin-std,如日志发送到kafka，那topic则为go-gin-std
+        # 如日志发送到es，那index名称为go-gin-log,如日志发送到kafka，那topic则为go-gin-log
+        env: 
+        - name: aliyun_logs_go-gin-std
+          value: "stdout"
+        - name: aliyun_logs_go-gin-log
+          value: "/app/log/*.log"
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        imagePullPolicy: IfNotPresent
+        # 对pod内要收集的业务日志目录需要进行共享，可以收集多个目录下的日志文件
+        volumeMounts:
+          - name: gin-log
+            mountPath: /app/log/
+      volumes: 
+        - name: gin-log
+          emptyDir: {}
+      
+      imagePullSecrets:
+      - name: harbor
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 0
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600
+
+---
+# service.yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: go-gin-log-k8s
+  namespace: prod
+  labels:
+    go-app: go-gin-log-k8s
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+    name: http
+  selector:
+    app: go-gin-log-k8s
+
+---
+# ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: prod
+  name: go-gin-log-k8s
+spec:
+  rules:
+  - host: go-gin-log-k8s.alnk.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: go-gin-log-k8s
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+```
 
 
 
