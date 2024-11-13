@@ -67,7 +67,7 @@
 
 > https://www.elastic.co/guide/en/cloud-on-k8s/2.7/k8s-quickstart.html
 >
-> ![1731228390645](images\1731228390645.png)  
+> ![1731228390645](images/1731228390645.png)  
 
 
 
