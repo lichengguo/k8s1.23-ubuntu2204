@@ -26,7 +26,7 @@
 
 ##### Prometheus-Operator的架构图
 
-![1730298915954](.\images\1730298915954.png)
+![1730298915954](./images/1730298915954.png)
 
 ##### Prometheus-Operator能做什么
 
@@ -404,7 +404,7 @@ spec:
 # kubectl apply -f prometheus-ingress.yaml
 ```
 
-![](images\1730729845851.png)
+![](images/1730729845851.png)
 
 ##### 访问grafana的UI
 
@@ -439,7 +439,7 @@ https://github.com/prometheus-operator/kube-prometheus/issues/1763#issuecomment-
 
 ```
 
-  ![1730729917210](images\1730729917210.png)
+  ![1730729917210](images/1730729917210.png)
 
 ##### 访问alertmanager的UI
 
@@ -505,7 +505,7 @@ spec:
 
 > 访问prometheus后台，点击上方 `菜单栏`-`Status` — `Targets` ，发现kube-controller-manager和kube-scheduler未发现
 >
-> ![1730730103709](images\1730730103709.png)
+> ![1730730103709](images/1730730103709.png)
 
 ##### 监控kube-controller-manager
 
@@ -557,7 +557,7 @@ subsets:
 >
 > 问题：还是监控不到controller-manager
 >
-> ![1730737060699](images\1730737060699.png)
+> ![1730737060699](images/1730737060699.png)
 
 > 解决办法
 >
@@ -586,7 +586,7 @@ subsets:
 > # systemctl restart kube-controller-manager.service
 > ```
 >
-> ![1730737224474](images\1730737224474.png)
+> ![1730737224474](images/1730737224474.png)
 
 ##### 监控kube-scheduler
 
@@ -743,7 +743,7 @@ spec:
 # kubectl apply -f prometheus-etcd.yaml 
 ```
 
-![1730738269600](images\1730738269600.png)
+![1730738269600](images/1730738269600.png)
 
 grafana来展示被监控的ETCD指标
 
@@ -782,7 +782,7 @@ https://grafana.com/grafana/dashboards/3070-etcd/
 点击Import，即可显示etcd集群的图形监控信息
 ```
 
-![1730738489122](images\1730738489122.png)
+![1730738489122](images/1730738489122.png)
 
 ##### 监控nginx-ingress
 
@@ -855,7 +855,7 @@ spec:
 # kubectl apply -f ingress-nginx-servicemonitor.yaml
 ```
 
-![1730806910376](images\1730806910376.png)
+![1730806910376](images/1730806910376.png)
 
 > grafana模板
 >
@@ -863,7 +863,7 @@ spec:
 >
 > 14314
 
-![1730806995378](images\1730806995378.png)
+![1730806995378](images/1730806995378.png)
 
 ##### 监控k8s集群中的业务(go)
 
@@ -1113,9 +1113,9 @@ harbor.alnk.com/public/go-hello-prometheus-k8s  v0.1   18.7MB
 # kubectl apply -f http://k8s-yaml.alnk.com/go-hello-prometheus-k8s/go-hello-prometheus-k8s.yaml  
 ```
 
-![1730798677235](images\1730798677235.png)
+![1730798677235](images/1730798677235.png)  
 
-![1730805397812](images\1730805397812.png)
+![1730805397812](images/1730805397812.png)
 
 > 踩坑记录
 >
@@ -1331,13 +1331,13 @@ spec:
 OK
 ```
 
-![1730741801360](images\1730741801360.png)
+![1730741801360](images/1730741801360.png)
 
-![1730741843230](images\1730741843230.png)
+![1730741843230](images/1730741843230.png)
 
 #### 告警规则
 
-> ![1730881536911](images\1730881536911.png)
+> ![1730881536911](images/1730881536911.png)  
 >
 > ```shell
 > 【10.0.1.201】
@@ -1430,7 +1430,7 @@ monitoring-disk-rules-4cc0f124-65b6-4a71-8e3e-f28aadd7e88f.yaml
 
 web界面查看
 
-![1730832772857](images\1730832772857.png)
+![1730832772857](images/1730832772857.png)
 
 ##### 测试修改一条告警规则
 
@@ -1454,7 +1454,7 @@ web界面查看
 > # kubectl -n monitoring exec -it prometheus-k8s-0 /bin/sh
 > ```
 
-![1730834041952](images\1730834041952.png)
+![1730834041952](images/1730834041952.png)
 
 #### AlterManager报警配置
 
@@ -1462,7 +1462,7 @@ web界面查看
 
 > 现在报警规则有了，但是报警渠道还没有配置，所以下面来修改下Alertmanager的配置，首先可以去 Alertmanager 的页面上 status 路径下面查看 AlertManager 的配置信息:
 >
-> ![1730883778406](images\1730883778406.png)
+> ![1730883778406](images/1730883778406.png)
 >
 > 这些配置的来由也是之前创建的 manifests/alertmanager-secret.yaml
 >
@@ -1555,7 +1555,7 @@ web界面查看
 >
 > 然后查看alertmanger的web页面中的配置信息是否加载
 >
-> ![1730884613799](images\1730884613799.png)
+> ![1730884613799](images/1730884613799.png)  
 >
 > 配置文件详解
 >
@@ -2043,15 +2043,15 @@ func sendToDing(jsonByte []byte) {
 
 `在Prometheus的可视化页面查看是否加载了该配置`
 
-![1730898615943](images\1730898615943.png)
+![1730898615943](images/1730898615943.png)  
 
-![1730898786546](image/普罗米修斯-operator/1730898786546.png)
+![1730898786546](images/1730898786546.png)  
 
 
 
 > 可以看到，抓取到了`kube-dns`这个Service，这是因为Service 中含有 `prometheus.io/scrape=true`这个 annotation，可以查看下`kube-dns` 的service信息
 
-![1730899043544](images\1730899043544.png)  
+![1730899043544](images/1730899043544.png)  
 
 
 
@@ -2063,7 +2063,7 @@ func sendToDing(jsonByte []byte) {
 >
 > prometheus.io/port: "9999"
 
-![1730899164401](images\1730899164401.png)  
+![1730899164401](images/1730899164401.png)  
 
 
 
@@ -2079,7 +2079,7 @@ annotations:
     prometheus.io/scrape: "true"
 ```
 
-![1730899513172](images\1730899513172.png)  
+![1730899513172](images/1730899513172.png)  
 
 
 

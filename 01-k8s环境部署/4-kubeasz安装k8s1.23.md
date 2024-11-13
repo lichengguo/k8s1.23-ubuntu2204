@@ -2,7 +2,7 @@
 
 > 地址：https://github.com/easzlab/kubeasz
 >
-> kubeasz版本和k8s版本对照表![1722861171865](.\images\1722861171865.png)  
+> kubeasz版本和k8s版本对照表![1722861171865](./images/1722861171865.png)  
 
 
 

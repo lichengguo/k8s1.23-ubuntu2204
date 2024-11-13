@@ -8,7 +8,7 @@
 
 创建一个go项目，属于demo组，因为该组已经绑定了一个runner
 
-![1730997140534](images\1730997140534.png)  
+![1730997140534](images/1730997140534.png)  
 
 
 
@@ -186,6 +186,6 @@ root@ops:/home/gitlab-runner# chown gitlab-runner.gitlab-runner -R .docker/
 
 ```
 
-![1731000667304](images\1731000667304.png)
+![1731000667304](images/1731000667304.png)
 
-![1730999907607](images\1730999907607.png)  
+![1730999907607](images/1730999907607.png)  
