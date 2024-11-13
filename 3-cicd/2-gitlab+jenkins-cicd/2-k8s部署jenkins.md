@@ -25,7 +25,7 @@
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDX9XNGfkw1pSWCYkqZQWShy3kND+987K2OTXQwWkYTD3jHyx0Fi9UvQUKla5Jenc0UUdGdrrhTg9q2kfIkfP5DyKtrhi3ZC2EZRpBnEEraxdnaBc3UDYsvFqeu3wDVy8vj82di4ppp1sWQN7Wx8cRQTTsdNwv3Z5eO7dwT4MlLDjeQyUBFkHgWqLMf87ZWxyeRYeNw/8AW50tAmbq46i+Mqmi73OI+JcbjCcjqe819MqLqiGrndJMumWVdZU2g/glTwBMiFRj3UUNSC7WcHlNT74ooWo3dWz3Fb6/h+4GBsKavongzmpoLsErJMn0etMYBca5jGAzDFsSbI+JshEFL 1029612787@qq.com
 ```
 
-![1731061670067](images\1731061670067.png)    
+![1731061670067](images/1731061670067.png)    
 
 
 
@@ -211,19 +211,19 @@ spec:
 
 `访问jenkins`
 
-![1731069185146](images\1731069185146.png)  
+![1731069185146](images/1731069185146.png)  
 
 
 
 `修改密码 admin/root123`
 
-![1731069293111](images\1731069293111.png)  
+![1731069293111](images/1731069293111.png)  
 
 
 
 `允许匿名访问`
 
-![1731076473200](images\1731076473200.png)  
+![1731076473200](images/1731076473200.png)  
 
 
 
@@ -235,31 +235,31 @@ spec:
 
 
 
-![1731076705372](images\1731076705372.png)  
+![1731076705372](images/1731076705372.png)  
 
 
 
 `安装完成后，需要重启jenkins，最底下勾上重启`
 
-![1731077024264](images\1731077024264.png)  
+![1731077024264](images/1731077024264.png)  
 
 
 
 `可以看到已经有蓝海这个插件了`
 
-![1731077075913](images\1731077075913.png)  
+![1731077075913](images/1731077075913.png)  
 
 
 
 ##### 安装中文插件
 
-![1731077336138](images\1731077336138.png)  
+![1731077336138](images/1731077336138.png)  
 
-![1731077359850](images\1731077359850.png)  
+![1731077359850](images/1731077359850.png)  
 
 
 
-![1731078355394](images\1731078355394.png)  
+![1731078355394](images/1731078355394.png)  
 
 
 
