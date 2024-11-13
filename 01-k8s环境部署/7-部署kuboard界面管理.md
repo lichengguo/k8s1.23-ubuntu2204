@@ -28,18 +28,68 @@ root@ops:~# docker ps |grep kuboard
 
 ```shell
 # vi /etc/nginx/conf.d/kuboard.alnk.com.conf
-server {
-    listen       80;
-    server_name  kuboard.alnk.com;
+http {
+
+  # 您需要的其他配置
+
+  map $http_upgrade $connection_upgrade {
+      default upgrade;
+      '' close;
+  }
+
+  server {
+    listen       80; 
+    server_name  kuboard.alnk.com; # 替换成你的域名
 
     location / {
-        proxy_pass http://127.0.0.1:8888;
+      proxy_pass http://127.0.0.1:8888;  # 替换成你的 Kuboard IP 地址和端口
+      client_max_body_size 10m;
+      gzip on;
     }
+
+    location /k8s-ws/ {
+      proxy_pass  http://127.0.0.1:8888/k8s-ws/;  # 替换成你的 Kuboard IP 地址和端口
+      proxy_http_version 1.1;
+      proxy_pass_header Authorization;
+      proxy_set_header Upgrade "websocket";
+      proxy_set_header Connection "upgrade";
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # proxy_set_header X-Forwarded-Proto https; # 如果您在反向代理上启用了 HTTPS
+    }
+
+    location /k8s-proxy/ {
+      proxy_pass  http://127.0.0.1:8888/k8s-proxy/;  # 替换成你的 Kuboard IP 地址和端口
+      proxy_http_version 1.1;
+      proxy_pass_header Authorization;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $connection_upgrade;
+
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      # proxy_set_header X-Forwarded-Proto https; # 如果您在反向代理上启用了 HTTPS
+      gzip on;
+    }
+
+    error_page 404 /404.html;
+        location = /40x.html {
+    }
+
+    error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+    }
+  }
 }
 
 # nginx -t
 # systemctl reload nginx
 ```
+
+
+
+
 
 
 
