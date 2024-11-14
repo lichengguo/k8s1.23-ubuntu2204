@@ -12,21 +12,19 @@
 >
 > ##### 服务器规划
 >
-> | **IP**         | **主机名称** | **角色**        | **系统**       | **软件**                                                     | **配置**  |
-> | -------------- | ------------ | --------------- | -------------- | ------------------------------------------------------------ | --------- |
-> | **10.0.1.21**  | **ops**      | **运维机**      | ubuntu2204     | **harbor仓库、kubeasz**                                      | **2c/4g** |
-> | **10.0.1.100** | **虚拟IP**   | **/**           | **/**          | **流量入口、负载均衡、高可用、七层反向代理**                 | **/**     |
-> | **10.0.1.101** | **ha-1**     | **反向代理**    | **ubuntu2204** | **nginx、keepalived**                                        | **1c/2g** |
-> | **10.0.1.102** | **ha-2**     | **反向代理**    | **ubuntu2204** | **nginx、keepalived**                                        | **1c/2g** |
-> | **10.0.1.200** | **虚拟IP**   | **/**           | **/**          | **apiserver高可用、4层反向代理**                             | **/**     |
+> | **IP**         | **主机名称** | **角色**        | **系统**       | **软件**                                                            | **配置**  |
+> | -------------------- | ------------------ | --------------------- | -------------------- | ------------------------------------------------------------------------- | --------------- |
+> | **10.0.1.21**  | **ops**      | **运维机**      | ubuntu2204           | **harbor仓库、kubeasz**                                             | **2c/4g** |
+> | **10.0.1.100** | **虚拟IP**   | **/**           | **/**          | **流量入口、负载均衡、高可用、七层反向代理**                        | **/**     |
+> | **10.0.1.101** | **ha-1**     | **反向代理**    | **ubuntu2204** | **nginx、keepalived**                                               | **1c/2g** |
+> | **10.0.1.102** | **ha-2**     | **反向代理**    | **ubuntu2204** | **nginx、keepalived**                                               | **1c/2g** |
+> | **10.0.1.200** | **虚拟IP**   | **/**           | **/**          | **apiserver高可用、4层反向代理**                                    | **/**     |
 > | **10.0.1.201** | **master-1** | **k8s主节点**   | **ubuntu2204** | **apiserver、controller、scheduler、etcd、keepalived、nginx(l4lb)** | **2c/4g** |
 > | **10.0.1.202** | **master-2** | **k8s主节点**   | **ubuntu2204** | **apiserver、controller、scheduler、etcd、keepalived、nginx(l4lb)** | **2c/4g** |
-> | **10.0.1.203** | **node-1**   | **k8s工作节点** | **ubuntu2204** | **kubelet、kube-proxy**、**etcd**                            | **2c/8g** |
-> | **10.0.1.204** | **node-2**   | **k8s工作节点** | **ubuntu2204** | **kubelet、kube-proxy**                                      | **2c/8g** |
+> | **10.0.1.203** | **node-1**   | **k8s工作节点** | **ubuntu2204** | **kubelet、kube-proxy**、**etcd**                             | **2c/8g** |
+> | **10.0.1.204** | **node-2**   | **k8s工作节点** | **ubuntu2204** | **kubelet、kube-proxy**                                             | **2c/8g** |
 >
 > `如果使用公有云、10.0.1.100、10.0.1.101、10.0.1.102可直接使用SLB即可`
-
-
 
 #### 方案介绍
 
@@ -37,23 +35,19 @@
 > 使用sidcar容器(一个pod多容器)收集当前pod内一个或者多个业务容器的日志(通常基于emptyDir实现业务容器与sidcar之间的日志共享)
 > 该方式的优点：对当前收集日志的pod能做更详细的处理，按照预定义规则处理好的日志，再输出到kafka或者filebeat
 > 该方式的缺点：性能可能没那么好，因为一个pod就需要一个sidecar，如果有100个pod，那就需要100个sidecar，那么这个日志收集的agent就必须选用一个轻量级的工具，不然会占用很多额外资源
-> 
+>
 > 2-node节点收集
 > 基于daemonset部署日志收集进程，实现json-file类型(标准输出/dev/stdout、错误输出/dev/stderr)日志收集；
 > 该方式的优点：日志收集架构简单，易部署、易维护
 > 该方式的缺点：node节点产生的日志、路径、类型、日志内容都不同，很难做到把每个容器的日志都完整的处理好
-> 
+>
 > 3-在业务容器中内置日志收集服务进程
 > 就是除了业务容器，再另外起一个日志收集的进程，然后直接把日志推送到远端存储
 > ```
 >
-> ![1731227966562](images/1731227966562.png)  
+> ![1731227966562](images/1731227966562.png)
 >
-> ![1731227996239](images/1731227996239.png)  
-
-
-
-
+> ![1731227996239](images/1731227996239.png)
 
 #### operator部署elasticsearch和kibana
 
@@ -61,15 +55,11 @@
 >
 > 可参考 https://www.cuiliangblog.cn/detail/article/71
 
-
-
 ##### 查看版本支持
 
 > https://www.elastic.co/guide/en/cloud-on-k8s/2.7/k8s-quickstart.html
 >
-> ![1731228390645](images/1731228390645.png)  
-
-
+> ![1731228390645](images/1731228390645.png)
 
 ##### 部署eck-operator
 
@@ -105,8 +95,6 @@ statefulset.apps/elastic-operator   1/1     68s
 # kubectl -n elastic-system logs -f statefulset.apps/elastic-operator
 # kubectl -n elastic-system logs -f elastic-operator-0
 ```
-
-
 
 ##### 部署elasticsearch
 
@@ -203,7 +191,7 @@ spec:
     #tls:
       #selfSignedCertificate:
         #disabled: true 
-        
+      
 ---
 ##测试为了方便加上ingress，生产环境中可以不加
 apiVersion: networking.k8s.io/v1
@@ -232,13 +220,11 @@ spec:
               number: 9200
 ```
 
-![1731394188425](images/1731394188425.png)  
+![1731394188425](images/1731394188425.png)
 
   `http://elastic:25y69WWe1FC8F6Gh6iVHVt53@elastic.alnk.com/`
 
- ![1731420011582](images/1731420011582.png)  
-
-
+ ![1731420011582](images/1731420011582.png)
 
 ##### 部署kibana
 
@@ -304,7 +290,7 @@ spec:
           limits:
             memory: 2Gi
             cpu: 2  
-        
+      
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -336,9 +322,7 @@ spec:
 
 `账号密码 elastic:25y69WWe1FC8F6Gh6iVHVt53`
 
-  ![1731442773697](images/1731442773697.png)      
-
-
+  ![1731442773697](images/1731442773697.png)
 
 #### Node模式日志收集方案
 
@@ -347,12 +331,10 @@ spec:
 > ```text
 > 模拟业务服务   日志收集       日志存储     消费日志         消费目的服务
 > tomcat ---> log-pilot ---> kafka ---> logstash ---> elasticsearch ---> kibana
-> 
+>
 > 日志量很大的时候，怕es扛不住可以使用上面架构
-> 如果日志里不大，可以直接使用log-pilot --- > elasticsearch架构
+> 如果日志量不大，可以直接使用log-pilot --- > elasticsearch架构
 > ```
-
-
 
 ##### docker-compose部署kafka
 
@@ -504,7 +486,7 @@ services:
 
 ## 查看结果
 # docker-compose ps
-                  
+                
 ## 创建生产者
 # docker exec -it kafka1 bash
 $ kafka-console-producer.sh --broker-list 10.0.1.21:9092 --topic tomcat-syslog
@@ -523,13 +505,10 @@ badfa
 
 `http://10.0.1.21:8000/`
 
-![1731414846763](images/1731414846763.png)    
+![1731414846763](images/1731414846763.png)
 
-​    ![1731443122183](images/1731443122183.png)  
+    ![1731443122183](images/1731443122183.png)
 
-
-
-​    
 
 ##### 部署logstash
 
@@ -586,33 +565,31 @@ output {
 
 > `直接在kafka ui 创建消息，看es是否能收到`
 >
-> ![1731443709537](images/1731443709537.png)  
+> ![1731443709537](images/1731443709537.png)
 >
-> ![1731443740702](images/1731443740702.png)  
+> ![1731443740702](images/1731443740702.png)
 >
 > `访问kibana`
 >
-> ![1731443786504](images/1731443786504.png)  
+> ![1731443786504](images/1731443786504.png)
 >
 > `可以看到已经有数据传递过来了`
 >
-> ![1731443835960](images/1731443835960.png)  
+> ![1731443835960](images/1731443835960.png)
 >
 > `创建索引`
 >
-> ![1731443904901](images/1731443904901.png)    
+> ![1731443904901](images/1731443904901.png)
 >
 > `匹配所有以tomcat开头的记录`
 >
 > ![1731443928524](images/1731443928524.png)
 >
-> ![1731443961728](images/1731443961728.png)  
+> ![1731443961728](images/1731443961728.png)
 >
 > `Discover:可以看到已经收集到日志`
 >
-> ![1731444012176](images/1731444012176.png) 
-
-
+> ![1731444012176](images/1731444012176.png)
 
 ```shell
 【10.0.1.21】
@@ -723,7 +700,7 @@ spec:
         volumeMounts:
         - name: logstash-conf
           mountPath: /usr/share/logstash/config/logstash.conf
-          subPath: logstash.conf       
+          subPath: logstash.conf     
         - name: localtime
           mountPath: /etc/localtime
       volumes:
@@ -735,10 +712,6 @@ spec:
           path: /etc/localtime
           type: File
 ```
-
-
-
-
 
 ##### 部署log-pilot
 
@@ -843,7 +816,7 @@ spec:
             add:
             - SYS_ADMIN
       terminationGracePeriodSeconds: 30
-      
+    
       volumes:
       - name: sock
         hostPath:
@@ -873,8 +846,6 @@ spec:
           - key: kafka_topics
             path: kafka_topics
 ```
-
-
 
 ##### 部署tomcat模拟业务
 
@@ -922,7 +893,7 @@ spec:
         image: harbor.alnk.com/public/tomcat:7.0
         # 添加相应的环境变量
         # 下面收集了两块日志1、stdout 2、/usr/local/tomcat/logs/catalina.*.log
-        env:      
+        env:    
         # 如日志发送到es，那index名称为tomcat-syslog,如日志发送到kafka，那topic则为tomcat-syslog
         - name: aliyun_logs_tomcat-syslog   
           value: "stdout"
@@ -940,9 +911,7 @@ spec:
 
 `tomcat日志收集成功`
 
-![1731461197383](images/1731461197383.png)  
-
-
+![1731461197383](images/1731461197383.png)
 
 ##### 模拟新业务上线收集日志
 
@@ -1040,8 +1009,6 @@ CMD ["./go-gin-log"]
 # docker run --rm -it harbor.alnk.com/public/go-gin-log:0.4 sh
 ```
 
-
-
 ```shell
 【10.0.1.21】
 ### 创建目录
@@ -1102,7 +1069,7 @@ spec:
       volumes: 
         - name: gin-log
           emptyDir: {}
-      
+    
       imagePullSecrets:
       - name: harbor
       restartPolicy: Always
@@ -1157,8 +1124,6 @@ spec:
         pathType: Prefix
 ```
 
-
-
 `修改log-pilot的配置文件`
 
 ```yaml
@@ -1178,9 +1143,7 @@ data:
 
 `重启log-pilot服务,然后去kafka-ui中页面看是否有相应的topic`
 
-![1731471703297](images/1731471703297.png)  
-
-
+![1731471703297](images/1731471703297.png)
 
 `修改logstash配置，把日志从kafka存储到es中去`
 
@@ -1219,7 +1182,7 @@ data:
       }
       ### 以上为添加内容 ###
     }
-    
+  
     filter {
     }
 
@@ -1239,29 +1202,21 @@ data:
 
 ```
 
-
-
 `查看logstash的日志输出，已经解析到go-gin-log`
 
-![1731505222435](images/1731505222435.png)  
-
-
+![1731505222435](images/1731505222435.png)
 
 `kafka-ui上查看，已经多出一个go-gin-logstash的消费者`
 
-![1731505255229](images/1731505255229.png)  
+![1731505255229](images/1731505255229.png)
 
 `kibana重建索引`
 
-![1731505357599](images/1731505357599.png)  
+![1731505357599](images/1731505357599.png)
 
-![1731505411012](images/1731505411012.png)  
+![1731505411012](images/1731505411012.png)
 
-![1731505445612](./images/1731505445612.png)  
-
-
-
-
+![1731505445612](./images/1731505445612.png)
 
 #### 边车模式日志收集方案
 
@@ -1270,12 +1225,10 @@ data:
 > ```text
 > 模拟业务服务/日志收集       日志存储     消费日志         消费目的服务       索引展示
 > 业务app/filebeat     ---> kafka ---> logstash ---> elasticsearch ---> kibana
-> 
+>
 > 日志量很大的时候，怕es扛不住可以使用上面架构
-> 如果日志里不大，可以直接使用app/filebeat --- > elasticsearch架构
+> 如果日志量不大，可以直接使用app/filebeat --- > elasticsearch架构
 > ```
-
-
 
 ##### 模拟业务上线收集日志
 
@@ -1366,14 +1319,14 @@ spec:
         volumeMounts:
           - name: logm
             mountPath: /app/log/ # 具体要看业务容器的日志在哪个目录
-      
+    
       - name: go-gin-log-filebeat-test
         image: harbor.alnk.com/public/filebeat:6.8.6
         imagePullPolicy: IfNotPresent
         # 按照自定义的配置文件启动
         args:
         - -c
-        - /usr/share/filebeat/filebeat.yaml               
+        - /usr/share/filebeat/filebeat.yaml             
         volumeMounts:
         # filebeat配置文件
         - name: filebeat-conf
@@ -1392,7 +1345,7 @@ spec:
         configMap:
           # filebeat容器以filebeat用户运行，防止权限不错报错
           defaultMode: 0644
-          name: filebeat-go-gin-log-configmap     
+          name: filebeat-go-gin-log-configmap   
       imagePullSecrets:
       - name: harbor
       restartPolicy: Always
@@ -1449,9 +1402,7 @@ spec:
 
 `kafka已经收到test-go-gin-log日志`
 
-![1731572073728](images/1731572073728.png)  
-
-
+![1731572073728](images/1731572073728.png)
 
 `接下来修改logstash从kafka获取日志推送到es就完工`
 
@@ -1520,8 +1471,6 @@ data:
     }
 ```
 
-![1731572625808](images/1731572625808.png)  
+![1731572625808](images/1731572625808.png)
 
-
-
-![1731572670654](images/1731572670654.png)  
+![1731572670654](images/1731572670654.png)
