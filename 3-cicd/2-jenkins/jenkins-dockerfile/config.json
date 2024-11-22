@@ -1,0 +1,7 @@
+{
+    "auths": {
+            "harbor.alnk.com": {
+                    "auth": "YWRtaW46SGFyYm9yMTIzNDU="
+            }
+    }
+}

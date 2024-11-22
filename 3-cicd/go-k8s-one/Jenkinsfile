@@ -1,0 +1,57 @@
+// pipeline流水线
+pipeline {
+ agent any
+
+ environment {
+     // 获取系统当前时间作为镜像的版本号
+     BUILD_TIME = new Date().format('yyyyMMdd_HHmmss')
+
+     // harbor仓库地址
+     HARBOR_URL = "harbor.alnk.com"
+ }
+
+ // 为了让远程SSH也获取到变量
+ parameters {
+     // 项目名称，deployment名称
+     string(name: 'app_name', defaultValue: 'go-k8s-one')
+     // 镜像名称
+     string(name: 'image_name', defaultValue: 'public/go-k8s-one')
+     // git仓库地址
+     string(name: 'git_repo', defaultValue: 'git@10.0.1.21:demo/go-k8s-one.git')
+     // git仓库分支
+     string(name: 'git_ver', defaultValue: 'test')
+ }
+
+ stages {   
+     stage('pull') { 
+         steps {
+             sh "git clone ${git_repo} ${app_name}/${env.BUILD_NUMBER} && cd ${app_name}/${env.BUILD_NUMBER} && git checkout ${git_ver}"
+         }
+     }
+   
+     stage('build') { 
+         steps {
+             sh "cd ${app_name}/${env.BUILD_NUMBER}  && docker build -t ${HARBOR_URL}/${image_name}:${BUILD_TIME} ."
+         }
+     }
+   
+     stage('push image') { 
+         steps {
+             sh "docker push ${HARBOR_URL}/${image_name}:${BUILD_TIME}"
+             sh "docker rmi ${HARBOR_URL}/${image_name}:${BUILD_TIME}"
+         }
+     }
+
+     stage('deploy k8s') {
+        steps {
+            configFileProvider([configFile(fileId: 'cefb1695-5f3d-4d75-9c89-6ce5dcba11ca', targetLocation: 'TEST_KUBECONFIG')]) {
+                 sh """
+                 sed -i "s#IMAGE_TAG#${HARBOR_URL}/${image_name}:${BUILD_TIME}#g" deploy/go-k8s-one.yaml         
+                 kubectl --kubeconfig=TEST_KUBECONFIG get nodes
+                 kubectl --kubeconfig=TEST_KUBECONFIG apply -f deploy/go-k8s-one.yaml
+                 """
+             }
+        }
+     }         
+ }
+}

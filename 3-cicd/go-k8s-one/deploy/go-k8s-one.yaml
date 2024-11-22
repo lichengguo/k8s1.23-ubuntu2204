@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go-k8s-one-cm
+  namespace: hello-yewu
+data:
+  config.ini: |
+    [nacos]
+    IP = 10.0.1.21
+    Port = 8848
+    # test名称空间
+    NameSpaceID = c19d7abe-0683-4168-af1d-c30f1183854f
+    DataID = go-k8s-one
+    Group = DEFAULT_GROUP
+
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: go-k8s-one
+  namespace: hello-yewu
+  labels:
+    name: go-k8s-one
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: go-k8s-one
+  template:
+    metadata:
+      labels:
+        app: go-k8s-one
+        name: go-k8s-one
+    spec:
+      volumes:
+      - name: configmap-volume
+        configMap:
+          name: go-k8s-one-cm
+      containers:
+      - name: go-k8s-one
+        # 在pipeline流水线中替换镜像
+        image: IMAGE_TAG
+        ports:
+        - containerPort: 9999
+          protocol: TCP
+        volumeMounts:
+        - name: configmap-volume
+          mountPath: app/conf
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        imagePullPolicy: IfNotPresent
+      imagePullSecrets:
+      - name: harbor
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 0
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: go-k8s-one
+  namespace: hello-yewu
+spec:
+  ports:
+  - protocol: TCP
+    port: 9999
+    targetPort: 9999
+  selector:
+    app: go-k8s-one
+
+---
+# ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: hello-yewu
+  name: go-k8s-one
+spec:
+  rules:
+  - host: go-k8s-one-test.alnk.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: go-k8s-one
+            port:
+              number: 9999
+        path: /
+        pathType: Prefix

@@ -1,0 +1,66 @@
+## filebeat日志收集
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: go-k8s-one
+  namespace: prod
+  labels:
+    name: go-k8s-one
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: go-k8s-one
+  template:
+    metadata:
+      labels:
+        app: go-k8s-one
+        name: go-k8s-one
+    spec:
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: go-k8s-one-cm
+        - name: logm
+          emptyDir: { }
+
+      containers:
+        - name: go-k8s-one
+          image: k8s-demo-image
+          ports:
+            - containerPort: 9999
+              protocol: TCP
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: app/conf
+            - name: logm
+              mountPath: /logs
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+
+        - name: filebeat
+          image: harbor.od.com/infra/filebeat:v7.6.1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ENV
+              value: prod
+            - name: PROJ_NAME
+              value: go-k8s-one-prod
+          volumeMounts:
+            - mountPath: /logm
+              name: logm
+      imagePullSecrets:
+        - name: harbor
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsUser: 0
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  revisionHistoryLimit: 7
+  progressDeadlineSeconds: 600
