@@ -161,29 +161,32 @@
 
 #### deployment创建过程
 
-> ![1732552153534](images/1732552153534.png)  
->
 > ```text
-> 10.0.1.203 --------------------------------------- 10.0.1.204
-> 1. kubectl 发送部署请求到 API Server
-> 2. API Server 通知 Controller Manager 创建一个 deployment 资源（scale扩容）
-> 3. Scheduler 执行调度任务，将两个副本 Pod 分发到 10.0.1.203 和 10.0.1.204
-> 4. 10.0.1.203 和 10.0.1.204 上的 kubelet在各自的节点上创建并运行 Pod
-> 5. 升级deployment的nginx服务镜像
+> ## deployment创建过程
+> 1. kubectl命令将deployment配置文件提交到apiserver，apierver会进行认证鉴权、校验等操作，确保请求的有 效性，并将deployment的信息存储到etcd
+> 
+> 2. Controller Manager会监听etcd中的资源变化事件，当新的deployment被创建时，deployment controller会根据deployment配置文件中的规格说明，创建一个或多个replicaSet对象。replicaSet负责确保pod的副本数量符合期望的状态， ReplicaSet Controller监听ReplicaSet的创建事件，并根据ReplicaSet的规格说明（通过Pod模板）创建相应数量的Pod
+> 
+> 3. Scheduler它监听新创建的Pod事件，并根据调度策略（如节点亲和性、污点、容忍、硬件资源等）为Pod选择一个合适的节点。调度完成后，Scheduler会将Pod与节点的绑定信息回写到etcd
+> 
+> 4. Kubelet进程监听etcd中的pod变化事件，发现有新的pod被调度到本节点时，Kubelet会调用容器运行时（如Docker、containerd等）来创建和启动容器。同时Kubelet还负责Pod的生命周期管理，包括健康检查、日志收集等
+> 
+> 5. Kube-Proxy是运行在集群各个节点上的网络代理，它负责实现服务发现和负载均衡。当有外部请求访问服务时，Kube-Proxy会根据服务的Endpoints信息将请求转发到正确的Pod或容器上
 > 
 > 
-> 这里补充一下：
+> 补充：
 > 这些应用的配置和当前服务的状态信息都是保存在ETCD中
 > 执行kubectl get pod等操作时API Server会从ETCD中读取这些数据
 > 
 > calico会为每个pod分配一个ip，但要注意这个ip不是固定的，它会随着pod的重启而发生变化
 > 
-> Node管理
+> Node管理：
 > 禁止pod调度到该节点上
 > kubectl cordon <node name> --delete-emptydir-data --ignore-daemonsets
 > 
 > 驱逐该节点上的所有pod
 > kubectl drain <node name>
+> 
 > 该命令会删除该节点上的所有Pod（DaemonSet除外），在其他node上重新启动它们
 > 通常该节点需要维护时使用该命令
 > 直接使用该命令会自动调用kubectl cordon <node>命令
