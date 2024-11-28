@@ -8,8 +8,27 @@
 > 
 > 修改redis的配置文件，并重启redis的服务
 > # vi /opt/redis_cluster/redis_6379/conf/redis_6379.conf
+> # 以守护进程模式启动
+> daemonize yes
 > # 绑定主机地址
 > bind 10.0.1.51
+> # 监听端口
+> port 6379
+> # pid文件和log文件的保存地址
+> pidfile  /opt/redis_cluster/redis_6379/pid/redis_6379.pid
+> logfile  /opt/redis_cluster/redis_6379/logs/redis_6379.log
+> # 设置数据库的数量，默认数据库为0
+> databases 16
+> # 指定本地持久化的文件名，默认是dump.rdb
+> # 900s有1一条数据，bgsave保存数据一次
+> save 900 1
+> # 300s 有10条数据，bgsave保存数据一次
+> save 300 10
+> # 60s 有1w条数据，bgsave保存数据一次
+> save 60 10000
+> dbfilename redis_6379.rdb
+> # 本地数据库目录
+> dir /data/redis_cluster/redis_6379
 > # 开启验证
 > requirepass 123456
 > 
@@ -114,10 +133,6 @@
 #### 建立主从复制关系
 
 > ```
-> # 注释10.0.1.51上的验证
-> # 开启验证
-> # requirepass 123456
-> 
 > 从库默认只有只读权限，建立主从关系后，从库默认会被清空
 > 
 > 
@@ -130,9 +145,36 @@
 > 2 建立主从方式2：
 > 写入从库配置文件中
 > # vi /opt/redis_cluster/redis_6379/conf/redis_6379.conf
+> # 以守护进程模式启动
+> daemonize yes
+> # 绑定主机地址
+> bind 10.0.1.52
+> # 监听端口
+> port 6379
+> # pid文件和log文件的保存地址
+> pidfile  /opt/redis_cluster/redis_6379/pid/redis_6379.pid
+> logfile  /opt/redis_cluster/redis_6379/logs/redis_6379.log
+> # 设置数据库的数量，默认数据库为0
+> databases 16
+> # 指定本地持久化的文件名，默认是dump.rdb
+> save 900 1
+> save 300 10
+> save 60 10000
+> dbfilename redis_6379.rdb
+> # 本地数据库目录
+> dir /data/redis_cluster/redis_6379
+> # 是否打开aof日志功能
+> appendonly yes
+> # 每一个命令都立即同步到aof
+> appendfsync always
+> # 每秒写1次
+> appendfsync everysec
+> # 写入工作交给操作系统，由操作系统判断缓冲区大小，统一写入到aof文件
+> appendfsync no
+> appendfilename "appendonly.aof"
 > # 开启主从关系
 > slaveof 10.0.1.51 6379
-> 
+> masterauth 123456
 > 
 > 重启redis
 > # pkill redis
@@ -141,7 +183,7 @@
 > 
 > 
 > 验证
-> # redis-cli -h 10.0.1.52
+> # redis-cli -h 10.0.1.52 -a 123456
 > 10.0.1.52:6379> set k5 v5
 > (error) READONLY You can't write against a read only replica.
 > 10.0.1.52:6379> keys *
