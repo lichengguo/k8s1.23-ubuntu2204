@@ -136,7 +136,7 @@
 > # pwd
 > /opt/redis_cluster/redis_6379/conf
 > 
-> # cat redis_6379.conf
+> # vi /opt/redis_cluster/redis_6379/conf/redis_6379.conf
 > # 以守护进程模式启动
 > daemonize yes
 > # 绑定主机地址
